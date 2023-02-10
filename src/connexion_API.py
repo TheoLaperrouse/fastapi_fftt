@@ -4,7 +4,7 @@ import random
 import time
 import requests
 from dotenv import dotenv_values
-import xml.etree.ElementTree as ET
+import xmltodict
 
 config = dotenv_values(".env")
 
@@ -30,14 +30,15 @@ def connexion_api(api, params=None):
     serie = random_str(15)
     tm = int(round(time.time() * 1000))
     tmc = sign_hmac_sha1(key, str(tm))
-    url = "http://www.fftt.com/mobile/pxml/{}.php?serie={}&tm={}&tmc={}&id={}".format(
-        api, serie, tm, tmc, ID)
+    url = f"http://www.fftt.com/mobile/pxml/{api}.php?serie={serie}&tm={tm}&tmc={tmc}&id={ID}"
+
     if params is not None:
-        url = "{}&{}".format(url, params)
+        url = f"{url}&{params}"
     try:
         response = requests.get(url)
-        root = ET.fromstring(response.text)
-        return root
+        print(response.text)
+        json = xmltodict.parse(response.text)
+        return json['liste']
     except requests.exceptions.RequestException as e:
         print(e)
         return None
