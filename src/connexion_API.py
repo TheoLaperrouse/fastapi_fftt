@@ -2,20 +2,12 @@ import hmac
 import hashlib
 import random
 import time
+import string
 import requests
 from dotenv import dotenv_values
 import xmltodict
 
 config = dotenv_values(".env")
-
-
-def random_str(length):
-    result = ""
-    characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-    characters_length = len(characters)
-    for i in range(length):
-        result += characters[random.randint(0, characters_length - 1)]
-    return result
 
 
 def sign_hmac_sha1(key, string):
@@ -27,8 +19,9 @@ def sign_hmac_sha1(key, string):
 def connexion_api(api, params=None):
     ID = config['ID_FFTT']
     key = hashlib.md5(config['KEY_FFTT'].encode('utf-8')).hexdigest()
-    serie = random_str(15)
-    tm = int(round(time.time() * 1000))
+    serie = ''.join(random.choices(
+        string.ascii_letters + string.digits, k=15)).upper()
+    tm = round(time.time() * 1000)
     tmc = sign_hmac_sha1(key, str(tm))
     url = f"http://www.fftt.com/mobile/pxml/{api}.php?serie={serie}&tm={tm}&tmc={tmc}&id={ID}"
 
@@ -36,9 +29,7 @@ def connexion_api(api, params=None):
         url = f"{url}&{params}"
     try:
         response = requests.get(url)
-        print(response.text)
-        json = xmltodict.parse(response.text)
-        return json['liste']
+        return xmltodict.parse(response.text)['liste']
     except requests.exceptions.RequestException as e:
         print(e)
         return None

@@ -5,27 +5,19 @@ import uvicorn
 app = FastAPI()
 
 
-@app.get("/")
-def read_root():
-    return {"Hello": "World"}
-
-
 @app.get("/players/{licence}")
-def getPlayerByLicence(licence: int):
-    res = connexion_api("xml_joueur", f"licence={licence}")
-    return res
+def getPlayerByLicence(licence: str):
+    return connexion_api("xml_joueur", f"licence={licence}")['joueur']
 
 
 @app.get("/players/club/{numClub}")
 def getPlayersByClub(numClub: str):
-    res = connexion_api("xml_liste_joueur", f"club={numClub}")
-    return res
+    return connexion_api("xml_liste_joueur", f"club={numClub}")['joueur']
 
 
 @app.get("/matches/{licence}")
 def getMatchesByLicence(licence: str):
-    res = connexion_api("xml_liste_joueur", f"licence={licence}")
-    return res
+    return connexion_api("xml_partie", f"numlic={licence}")
 
 
 if __name__ == "__main__":
