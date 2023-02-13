@@ -1,23 +1,29 @@
-# Fastapi FFTT
+# FastAPI FFTT
 
 ## Quick Start
-- Renseigner les variables d'environnement suivantes dans un fichier .env à la racine:
+
+- Install dependencies :
+```sh
+pip install -r requirements.txt
+```
+
+- Set up a .env file with theses keys:
 ```
 ID_FFTT=""
 KEY_FFTT=""
 ```
 
-- Lancer le serveur :
+- Run app :
 ```sh
-uvicorn src.main:app
+python3 src/main.py
 ```
 
-- Lancez le serveur en mode développement :
+- Run app in dev mode :
 ```sh
 uvicorn src.main:app --reload
 ```
 
-- Use with docker :
+- Use with Docker :
 ```sh
 docker build . -t fastapi_fftt 
 ```
