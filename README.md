@@ -2,12 +2,17 @@
 
 ## FFTT
 
-- Renseigner ces identifiants dans le .env
+- Renseigner ces identifiants dans le .env :
+```
+ID_FFTT=""
+KEY_FFTT=""
+```
 - Lancer le serveur :
 ```sh
-python -m src.main
+uvicorn src.main:app
 ```
 - Lancez le serveur en mode développement :
 ```sh
 uvicorn src.main:app --reload
 ```
+
