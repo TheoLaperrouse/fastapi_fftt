@@ -8,6 +8,7 @@ import xmltodict
 from dotenv import dotenv_values
 
 config = dotenv_values(".env")
+BASE_URL = 'http://www.fftt.com/mobile/pxml'
 
 def sign_hmac_sha1(key, time_str):
     '''Sign with sha1'''
@@ -24,7 +25,7 @@ def connexion_api(api, params=None):
         string.ascii_letters + string.digits, k=15)).upper()
     timestamp = int(round(time.time() * 1000))
     tmc = sign_hmac_sha1(key, str(timestamp))
-    url = f"http://www.fftt.com/mobile/pxml/{api}.php?serie={serie}&tm={timestamp}&tmc={tmc}&id={id_fftt}"
+    url = f"{BASE_URL}/{api}.php?serie={serie}&tm={timestamp}&tmc={tmc}&id={id_fftt}"
     if params is not None:
         url = f"{url}&{params}"
     try:

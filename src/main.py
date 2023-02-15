@@ -55,7 +55,7 @@ def get_pro_a_stats():
         victories = int(stats['vict'])
         matches = int(stats['matches'])
         players[player]['win_ratio'] = victories / matches
-        print(f'{player} : {victories} victoires / {matches} matches ({players[player]["win_ratio"]:.2f} %)')
+        print(f'{player} : {victories} / {matches} ({players[player]["win_ratio"]:.2f} %)')
     return players
 
 

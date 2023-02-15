@@ -1,11 +1,13 @@
 from mailjet_rest import Client
+from dotenv import dotenv_values
 
 config = dotenv_values(".env")
 
-def send_mail(recipient, data):
-    API_KEY = config['MJ_APIKEY_PUBLIC']
-    API_SECRET = config['MJ_APIKEY_PRIVATE']
-    mailjet = Client(auth=(API_KEY, API_SECRET))
+def send_mail(recipient, text):
+    '''Send a mail to recipient with text'''
+    api_key = config['MJ_APIKEY_PUBLIC']
+    api_secret = config['MJ_APIKEY_PRIVATE']
+    mailjet = Client(auth=(api_key, api_secret))
     data = {
         'Messages': [
             {
@@ -20,7 +22,7 @@ def send_mail(recipient, data):
                 }
             ],
             "Subject": "My first Mailjet Email!",
-            "TextPart": data
+            "TextPart": text
             }
         ]
     }
