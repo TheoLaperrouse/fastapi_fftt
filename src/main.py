@@ -49,14 +49,11 @@ def get_pro_a_stats():
                     players[player_b]['vict'] += not score_a
                     players[player_a]['matches'] += 1
                     players[player_b]['matches'] += 1
-    sorted_players = sorted(
-        players.items(), key=lambda x: int(x[1]['vict'])/int(x[1]['matches']), reverse=True)
-    for player, stats in sorted_players:
+    for player, stats in players.items():
         victories = int(stats['vict'])
         matches = int(stats['matches'])
         players[player]['win_ratio'] = victories / matches
-        print(f'{player} : {victories} / {matches} ({players[player]["win_ratio"]:.2f} %)')
-    return players
+    return  sorted(players.items(), key=lambda x: x[1]['win_ratio'] , reverse=True)
 
 
 def get_matches_poules_by_link(lien_div: str):

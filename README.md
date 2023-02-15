@@ -8,6 +8,8 @@ Use the FFTT (France Table Tennis Federation) Api to get Table Tennis players an
 
 Use pylint for static code analysis
 
+Deployed with AWS EC2 here : http://54.154.202.254/docs
+
 ## Quick Start
 
 - Install dependencies :
@@ -19,11 +21,6 @@ pip install -r requirements.txt
 ```
 ID_FFTT=""
 KEY_FFTT=""
-```
-
-- Run app :
-```sh
-python3 src/main.py
 ```
 
 - Run app in dev mode :

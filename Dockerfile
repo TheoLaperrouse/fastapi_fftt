@@ -1,7 +1,9 @@
 FROM python:3.8
 
+COPY requirements.txt .
+
+RUN pip install --no-cache-dir -r requirements.txt
+
 COPY . .
 
-RUN pip3 install -r requirements.txt
-
-CMD ["python" "-m src.main"]
+CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000"]
