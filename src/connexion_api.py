@@ -29,6 +29,10 @@ def connexion_api(api, params=None):
         url = f"{url}&{params}"
     try:
         response = requests.get(url, timeout=60)
-        return xmltodict.parse(response.text)['liste']
-    except requests.exceptions.RequestException as error:
+        return xmltodict.parse(response.text).get('liste')
+    except requests.exceptions.Timeout:
+        print("Request timed out")
+        return None
+    except requests.exceptions.HTTPError as error:
+        print(f"HTTP error occurred: {error}")
         return None

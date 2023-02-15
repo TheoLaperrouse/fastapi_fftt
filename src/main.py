@@ -8,25 +8,25 @@ app = FastAPI()
 @app.get("/players/{licence}")
 def get_player_by_licence(licence: str):
     '''Get player by licence'''
-    return connexion_api("xml_joueur", f"licence={licence}")['joueur']
+    return connexion_api("xml_joueur", f"licence={licence}").get('joueur')
 
 
 @app.get("/players/club/{num_club}")
 def get_players_by_club(num_club: str):
     '''Get players by club num'''
-    return connexion_api("xml_liste_joueur", f"club={num_club}")['joueur']
+    return connexion_api("xml_liste_joueur", f"club={num_club}").get('joueur')
 
 
 @app.get("/matches/{licence}")
 def get_match_by_licence(licence: str):
     '''Get last matches by licence'''
-    return connexion_api("xml_partie", f"numlic={licence}")['partie']
+    return connexion_api("xml_partie", f"numlic={licence}").get('partie')
 
 
 @app.get("/teams/{num_club}")
 def get_teams_by_club(num_club: str):
     '''Get team by club num'''
-    return connexion_api("xml_equipe", f"numclu={num_club}")["equipe"]
+    return connexion_api("xml_equipe", f"numclu={num_club}").get("equipe")
 
 
 @app.get("/proA")
@@ -40,7 +40,7 @@ def get_pro_a_stats():
                 if individual_match and individual_match['ja'] and individual_match['jb']:
                     player_a, player_b = individual_match['ja'], individual_match['jb']
                     print(individual_match)
-                    score_a = individual_match.get('score_a', -1) == '1'
+                    score_a = individual_match.get('scorea', -1) == '1'
                     players[player_a] = players.get(
                         player_a, {'vict': 0, 'matches': 0})
                     players[player_b] = players.get(
@@ -50,22 +50,23 @@ def get_pro_a_stats():
                     players[player_a]['matches'] += 1
                     players[player_b]['matches'] += 1
     sorted_players = sorted(
-        players.items(), key=lambda x: x[1]['vict']/x[1]['matches'], reverse=True)
-    for player, stats in sorted_players.items():
-        victories = stats['vict']
-        matches = stats['matches']
-        sorted_players[player]['win_ratio'] = victories / matches
+        players.items(), key=lambda x: int(x[1]['vict'])/int(x[1]['matches']), reverse=True)
+    for player, stats in sorted_players:
+        victories = int(stats['vict'])
+        matches = int(stats['matches'])
+        players[player]['win_ratio'] = victories / matches
+        print(f'{player} : {victories} victoires / {matches} matches ({players[player]["win_ratio"]:.2f} %)')
     return players
 
 
 def get_matches_poules_by_link(lien_div: str):
     '''Get matches poules with a link'''
-    return connexion_api("xml_result_equ", lien_div)['tour']
+    return connexion_api("xml_result_equ", lien_div).get('tour',[])
 
 
 def get_match_by_link(lien_match: str):
     '''Get individuals matches with a link'''
-    return connexion_api("xml_chp_renc", lien_match).get('partie')
+    return connexion_api("xml_chp_renc", lien_match).get('partie',[])
 
 
 def get_pro_a():

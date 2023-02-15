@@ -1,5 +1,13 @@
 # FastAPI FFTT
 
+## Explanation
+
+FastApi / Uvicorn Backend
+
+Use the FFTT (France Table Tennis Federation) Api to get Table Tennis players and their results.
+
+Use pylint for static code analysis
+
 ## Quick Start
 
 - Install dependencies :

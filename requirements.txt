@@ -3,3 +3,4 @@ fastapi
 pylint
 xmltodict
 uvicorn
+mailjet_rest
