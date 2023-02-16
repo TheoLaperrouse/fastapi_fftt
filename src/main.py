@@ -10,11 +10,16 @@ def get_player_by_licence(licence: str):
     '''Get player by licence'''
     return connexion_api("xml_joueur", f"licence={licence}").get('joueur')
 
+@app.get("/players/name/{last_name}_{first_name}")
+def get_player_by_name(last_name: str, first_name:str):
+    '''Get player by name'''
+    return connexion_api("xml_liste_joueur_o", f"nom={last_name}&prenom={first_name}").get('joueur')
+
 
 @app.get("/players/club/{num_club}")
 def get_players_by_club(num_club: str):
     '''Get players by club num'''
-    return connexion_api("xml_liste_joueur", f"club={num_club}").get('joueur')
+    return connexion_api("xml_liste_joueur_o", f"club={num_club}").get('joueur')
 
 
 @app.get("/matches/{licence}")
@@ -39,7 +44,6 @@ def get_pro_a_stats():
             for individual_match in match:
                 if individual_match and individual_match['ja'] and individual_match['jb']:
                     player_a, player_b = individual_match['ja'], individual_match['jb']
-                    print(individual_match)
                     score_a = individual_match.get('scorea', -1) == '1'
                     players[player_a] = players.get(
                         player_a, {'vict': 0, 'matches': 0})
@@ -49,10 +53,8 @@ def get_pro_a_stats():
                     players[player_b]['vict'] += not score_a
                     players[player_a]['matches'] += 1
                     players[player_b]['matches'] += 1
-    for player, stats in players.items():
-        victories = int(stats['vict'])
-        matches = int(stats['matches'])
-        players[player]['win_ratio'] = victories / matches
+    for stats in players.values():
+        stats['win_ratio'] = f'{int(stats["vict"]) / int(stats["matches"]):.2f}'
     return  sorted(players.items(), key=lambda x: x[1]['win_ratio'] , reverse=True)
 
 
