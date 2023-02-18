@@ -44,3 +44,22 @@ docker build . -t fastapi_fftt
 ```sh
 docker run -d -p 80:8000 fastapi_fftt 
 ```
+
+### Use Cases :
+
+Script Python (in use_cases folder) :
+- Get victories of a player :
+```python
+res = requests.get("http://fastapifftt.thorigne-tt.net/matches/3524012",timeout=60)
+for match in res.json():
+    if match['victoire'] == 'V':
+        print(f"{match['nom']} : {match['classement']} points")
+```
+- Get ProA Stats :
+```python
+res = requests.get("http://fastapifftt.thorigne-tt.net/proA", timeout=60)
+for player in res.json():
+    print(f'{player[0]} : {player[1]["vict"]}/{player[1]["matches"]} ' \
+        f'({player[1]["win_ratio"]:.2f}%)')
+
+```
