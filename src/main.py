@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+import datetime
 import uvicorn
 from src.connexion_api import connexion_api
 
@@ -10,8 +11,9 @@ def get_player_by_licence(licence: str):
     '''Get player by licence'''
     return connexion_api("xml_joueur", f"licence={licence}").get('joueur')
 
+
 @app.get("/players/name/{last_name}_{first_name}")
-def get_player_by_name(last_name: str, first_name:str):
+def get_player_by_name(last_name: str, first_name: str):
     '''Get player by name'''
     return connexion_api("xml_liste_joueur_o", f"nom={last_name}&prenom={first_name}").get('joueur')
 
@@ -54,18 +56,27 @@ def get_pro_a_stats():
                     players[player_a]['matches'] += 1
                     players[player_b]['matches'] += 1
     for stats in players.values():
-        stats['win_ratio'] = f'{int(stats["vict"]) / int(stats["matches"]):.2f}'
-    return  sorted(players.items(), key=lambda x: x[1]['win_ratio'] , reverse=True)
+        stats['win_ratio'] = f'{stats["vict"] / stats["matches"]:.2f}'
+    return sorted(players.items(), key=lambda x: x[1]['win_ratio'], reverse=True)
 
 
 def get_matches_poules_by_link(lien_div: str):
     '''Get matches poules with a link'''
-    return connexion_api("xml_result_equ", lien_div).get('tour',[])
+    return connexion_api("xml_result_equ", lien_div).get('tour', [])
 
 
 def get_match_by_link(lien_match: str):
     '''Get individuals matches with a link'''
-    return connexion_api("xml_chp_renc", lien_match).get('partie',[])
+    return connexion_api("xml_chp_renc", lien_match).get('partie', [])
+
+
+def get_matches_by_phase(num_club: str):
+    '''Get all the matches of a club for a phase'''
+    teams = get_teams_by_club(num_club)
+    allMatchesByTeam = [get_matches_poules_by_link(
+        team["link"]) for team in teams]
+    allMatches = [match for matches in allMatchesByTeam for match in matches]
+    return allMatches.sort(key=lambda match: datetime.datetime.strptime(match["date"], "%d/%m/%Y"))
 
 
 def get_pro_a():
@@ -73,7 +84,7 @@ def get_pro_a():
     for team in get_teams_by_club('03350060'):
         if 'FED_PRO A' in team['libdivision']:
             return team['liendivision']
-    return ''
+    return None
 
 
 if __name__ == "__main__":
