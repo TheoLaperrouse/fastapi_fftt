@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 import datetime
+import shortuuid
 import uvicorn
 from src.connexion_api import connexion_api
 
@@ -30,10 +31,27 @@ def get_match_by_licence(licence: str):
     return connexion_api("xml_partie", f"numlic={licence}").get('partie')
 
 
+@app.get("/matches/club/{num_club}")
+def get_matches_by_phase(num_club: str):
+    '''Get all the matches of a club for a phase'''
+    teams = get_teams_by_club(num_club)
+    all_matches_by_team = [get_matches_poules_by_link(
+        team["link"]) for team in teams]
+    all_matches = [
+        match for matches in all_matches_by_team for match in matches]
+    return all_matches.sort(key=lambda match: datetime.datetime.strptime(match["date"], "%d/%m/%Y"))
+
+
 @app.get("/teams/{num_club}")
 def get_teams_by_club(num_club: str):
     '''Get team by club num'''
     return connexion_api("xml_equipe", f"numclu={num_club}").get("equipe")
+
+
+@app.get("/short_uuid_to_uuid/{id}")
+def short_uuid(id: str):
+    '''Get an uuid from short_uuid'''
+    return shortuuid.decode(id)
 
 
 @app.get("/proA")
@@ -68,15 +86,6 @@ def get_matches_poules_by_link(lien_div: str):
 def get_match_by_link(lien_match: str):
     '''Get individuals matches with a link'''
     return connexion_api("xml_chp_renc", lien_match).get('partie', [])
-
-
-def get_matches_by_phase(num_club: str):
-    '''Get all the matches of a club for a phase'''
-    teams = get_teams_by_club(num_club)
-    allMatchesByTeam = [get_matches_poules_by_link(
-        team["link"]) for team in teams]
-    allMatches = [match for matches in allMatchesByTeam for match in matches]
-    return allMatches.sort(key=lambda match: datetime.datetime.strptime(match["date"], "%d/%m/%Y"))
 
 
 def get_pro_a():
