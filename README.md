@@ -12,6 +12,8 @@ Deployed with AWS EC2 here :
 
 http://fastapifftt.thorigne-tt.net/docs
 
+CI to lint and redeploy on push with Github secrets
+
 ## Quick Start
 
 - Set up a .env file with theses keys:
