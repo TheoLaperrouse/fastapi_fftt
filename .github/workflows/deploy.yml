@@ -1,12 +1,15 @@
-name: Redeploy fastapi_fftt application on AWS EC2
+name: Redeploy fastapi_fftt
 
 on:
   push:
-    branches: [ main ]
+    branches: [ master ]
 
 jobs:
-  redeploy:
+  deploy:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
