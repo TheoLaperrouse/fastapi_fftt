@@ -1,8 +1,12 @@
-from fastapi import FastAPI
+import uuid
 import datetime
-import shortuuid
 import uvicorn
+from fastapi import FastAPI
 from src.connexion_api import connexion_api
+from src.short_uuid import enlarge_uuid, shorten_uuid
+
+ALPHABET = '123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ'
+
 
 app = FastAPI()
 
@@ -48,10 +52,23 @@ def get_teams_by_club(num_club: str):
     return connexion_api("xml_equipe", f"numclu={num_club}").get("equipe")
 
 
-@app.get("/short_uuid_to_uuid/{id}")
-def short_uuid(id: str):
-    '''Get an uuid from short_uuid'''
-    return shortuuid.decode(id)
+@app.get("/short_uuid_to_uuid/{short_uuid}")
+def short_uuid_to_uuid(short_uuid):
+    base = len(ALPHABET)
+    uuid_int = sum(ALPHABET.index(c) * base ** i for i,
+                   c in enumerate(reversed(short_uuid)))
+    return str(uuid.UUID(int=uuid_int, version=4))
+
+
+@app.get("/uuid_to_short_uuid/{uuid}")
+def uuid_to_short_uuid(uuid):
+    uuid_int = int(uuid.replace('-', ''), 16)
+    base = len(ALPHABET)
+    digits = []
+    while uuid_int:
+        uuid_int, remainder = divmod(uuid_int, base)
+        digits.append(ALPHABET[remainder])
+    return ''.join(reversed(digits))
 
 
 @app.get("/proA")

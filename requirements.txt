@@ -4,4 +4,4 @@ pylint
 xmltodict
 uvicorn
 mailjet_rest
-shortuuid
+uuid
