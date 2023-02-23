@@ -2,10 +2,15 @@ import uuid
 import datetime
 import uvicorn
 from fastapi import FastAPI
+from fastapi.responses import RedirectResponse
 from src.connexion_api import connexion_api
 
 app = FastAPI()
 
+@app.get("/", response_class=RedirectResponse, status_code=302)
+async def redirect_to_docs():
+    '''Redirect to docs on /'''
+    return "http://fastapifftt.thorigne-tt.net/docs"
 
 @app.get("/players/{licence}")
 def get_player_by_licence(licence: str):
