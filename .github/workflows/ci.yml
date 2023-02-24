@@ -43,5 +43,5 @@ jobs:
         SSH_KEY: ${{ secrets.SSH_KEY }}
       run: |
         echo "${SSH_KEY}" > key.pem
-        chmod 777 key.pem
-        ssh -i key.pem ubuntu@ec2-54-154-202-254.eu-west-1.compute.amazonaws.com "cd fastapi_fftt && git pull && sudo docker rm -f fastapi_fftt && sudo docker build . -t fastapi_fftt && sudo docker run -d -p 80:8000 --name fastapi_fftt fastapi_fftt"
+        chmod 400 key.pem
+        ssh -o "StrictHostKeyChecking no" -i key.pem ubuntu@ec2-54-154-202-254.eu-west-1.compute.amazonaws.com "cd fastapi_fftt && git pull && sudo docker rm -f fastapi_fftt && sudo docker build . -t fastapi_fftt && sudo docker run -d -p 80:8000 --name fastapi_fftt fastapi_fftt"
