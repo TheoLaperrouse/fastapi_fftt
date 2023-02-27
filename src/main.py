@@ -1,5 +1,6 @@
 import uuid
-import datetime
+from datetime import datetime
+import re
 import uvicorn
 from fastapi import FastAPI
 from fastapi.responses import RedirectResponse
@@ -38,20 +39,20 @@ def get_match_by_licence(licence: str):
 
 @app.get("/matches/club/{num_club}")
 def get_matches_by_phase(num_club: str):
-    '''Get all the matches of a club for a phase'''
+    '''Get all the matches of a club for the actual phase'''
     teams = get_teams_by_club(num_club)
-    all_matches_by_team = [get_matches_poules_by_link(
-        team["link"]) for team in teams]
-    all_matches = [
-        match for matches in all_matches_by_team for match in matches]
-    return all_matches.sort(key=lambda match: datetime.datetime.strptime(match["date"], "%d/%m/%Y"))
+    all_matches_by_team = [get_matches_poules_by_link(team["liendivision"]) for team in teams]
+    all_matches = [match for matches in all_matches_by_team for match in matches]
+    return sorted(all_matches, key=lambda d: datetime.strptime(d["dateprevue"], "%d/%m/%Y"))
 
 
 @app.get("/teams/{num_club}")
 def get_teams_by_club(num_club: str):
-    '''Get team by club num'''
-    return connexion_api("xml_equipe", f"numclu={num_club}").get("equipe")
-
+    '''Get teams by club num for the actual phase'''
+    phase = get_actual_phase()
+    teams = connexion_api("xml_equipe", f"numclu={num_club}").get("equipe")
+    regex_phase = re.compile(f"Phase {phase}|Ph{phase}|Ph {phase}")
+    return [team for team in teams if regex_phase.findall(team['libdivision'])]
 
 @app.get("/proA")
 def get_pro_a_stats():
@@ -118,6 +119,9 @@ def get_pro_a():
             return team['liendivision']
     return None
 
+def get_actual_phase():
+    '''Get the actual phase (1 or 2)'''
+    return 1 if datetime.now().month > 8 else 2
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
