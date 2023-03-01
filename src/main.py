@@ -8,10 +8,12 @@ from src.connexion_api import connexion_api
 
 app = FastAPI()
 
+
 @app.get("/", response_class=RedirectResponse, status_code=302)
 async def redirect_to_docs():
     '''Redirect to docs on /'''
     return "http://fastapifftt.thorigne-tt.net/docs"
+
 
 @app.get("/players/{licence}")
 def get_player_by_licence(licence: str):
@@ -41,8 +43,10 @@ def get_match_by_licence(licence: str):
 def get_matches_by_phase(num_club: str):
     '''Get all the matches of a club for the actual phase'''
     teams = get_teams_by_club(num_club)
-    all_matches_by_team = [get_matches_poules_by_link(team["liendivision"]) for team in teams]
-    all_matches = [match for matches in all_matches_by_team for match in matches]
+    all_matches_by_team = [get_matches_poules_by_link(
+        team["liendivision"]) for team in teams]
+    all_matches = [
+        match for matches in all_matches_by_team for match in matches]
     return sorted(all_matches, key=lambda d: datetime.strptime(d["dateprevue"], "%d/%m/%Y"))
 
 
@@ -53,6 +57,7 @@ def get_teams_by_club(num_club: str):
     teams = connexion_api("xml_equipe", f"numclu={num_club}").get("equipe")
     regex_phase = re.compile(f"Phase {phase}|Ph{phase}|Ph {phase}")
     return [team for team in teams if regex_phase.findall(team['libdivision'])]
+
 
 @app.get("/proA")
 def get_pro_a_stats():
@@ -114,14 +119,22 @@ def get_match_by_link(lien_match: str):
 
 def get_pro_a():
     '''Get the proA team'''
-    for team in get_teams_by_club('03350060'):
+    for team in get_all_teams_by_club('03350060'):
         if 'FED_PRO A' in team['libdivision']:
             return team['liendivision']
     return None
 
+
 def get_actual_phase():
     '''Get the actual phase (1 or 2)'''
     return 1 if datetime.now().month > 8 else 2
+
+
+@app.get("/teams/{num_club}")
+def get_all_teams_by_club(num_club: str):
+    '''Get teams by num club'''
+    return connexion_api("xml_equipe", f"numclu={num_club}").get("equipe")
+
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
