@@ -79,7 +79,7 @@ def get_pro_a_stats():
                     players[player_a]['matches'] += 1
                     players[player_b]['matches'] += 1
     for stats in players.values():
-        stats['win_ratio'] = f'{stats["vict"] / stats["matches"]:.2f}'
+        stats['win_ratio'] = f'{stats["vict"] / stats["matches"]:.0%}'
     return sorted(players.items(), key=lambda x: x[1]['win_ratio'], reverse=True)
 
 
