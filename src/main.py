@@ -32,22 +32,32 @@ def get_players_by_club(num_club: str):
     '''Get players by club num'''
     return connexion_api("xml_liste_joueur_o", f"club={num_club}").get('joueur')
 
+@app.get("/matches/tftt")
+def get_tftt_matches():
+    '''Get all the matches of the TFTT for the actual phase'''
+    filtered_teams = [team for team in get_teams_by_club("03350060") if 'Vétérans' not in team["libdivision"]]
+    all_matches_by_team = [get_matches_poules_by_link(
+        team["liendivision"]) for team in filtered_teams]
+    all_matches = [
+        match for matches in all_matches_by_team for match in matches]
+    return sorted(all_matches, key=lambda d: datetime.strptime(d["dateprevue"], "%d/%m/%Y"))
+
+@app.get("/matches/club/{num_club}")
+def get_matches_by_phase(num_club: str):
+    '''Get all the matches of a club for the actual phase'''
+    teams = get_teams_by_club(num_club)
+    print(teams)
+    all_matches_by_team = [get_matches_poules_by_link(
+        team["liendivision"]) for team in teams]
+    all_matches = [
+        match for matches in all_matches_by_team for match in matches]
+    return sorted(all_matches, key=lambda d: datetime.strptime(d["dateprevue"], "%d/%m/%Y"))
 
 @app.get("/matches/{licence}")
 def get_match_by_licence(licence: str):
     '''Get last matches by licence'''
     return connexion_api("xml_partie", f"numlic={licence}").get('partie')
 
-
-@app.get("/matches/club/{num_club}")
-def get_matches_by_phase(num_club: str):
-    '''Get all the matches of a club for the actual phase'''
-    teams = get_teams_by_club(num_club)
-    all_matches_by_team = [get_matches_poules_by_link(
-        team["liendivision"]) for team in teams]
-    all_matches = [
-        match for matches in all_matches_by_team for match in matches]
-    return sorted(all_matches, key=lambda d: datetime.strptime(d["dateprevue"], "%d/%m/%Y"))
 
 
 @app.get("/teams/{num_club}")
