@@ -5,3 +5,4 @@ xmltodict
 uvicorn
 mailjet_rest
 uuid
+fastapi_utils
