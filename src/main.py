@@ -32,17 +32,28 @@ def get_players_by_club(num_club: str):
     '''Get players by club num'''
     return connexion_api("xml_liste_joueur_o", f"club={num_club}").get('joueur')
 
+
 @app.get("/matches/tftt")
 def get_tftt_matches():
     '''Get all the matches of the TFTT for the actual phase'''
-    filtered_teams = [team for team in get_teams_by_club("03350060") if 'Vétérans' not in team["libdivision"]]
+    filtered_teams = [
+        team for team in get_teams_by_club("03350060")
+        if 'Vétérans' not in team["libdivision"]
+    ]
     all_matches_by_team = [get_matches_poules_by_link(
         team["liendivision"]) for team in filtered_teams]
     all_matches = [
-        match for matches in all_matches_by_team for match in matches]
+        match for matches in all_matches_by_team
+        for match in matches
+        if match is not None
+        and match['equa'] is not None
+        and match['equb'] is not None
+        and ('THORIGNE' in match['equa'] or 'THORIGNE' in match['equb'])
+    ]
     return sorted(all_matches, key=lambda d: datetime.strptime(d["dateprevue"], "%d/%m/%Y"))
 
-@app.get("/matches/club/{num_club}")
+
+@ app.get("/matches/club/{num_club}")
 def get_matches_by_phase(num_club: str):
     '''Get all the matches of a club for the actual phase'''
     teams = get_teams_by_club(num_club)
@@ -53,14 +64,14 @@ def get_matches_by_phase(num_club: str):
         match for matches in all_matches_by_team for match in matches]
     return sorted(all_matches, key=lambda d: datetime.strptime(d["dateprevue"], "%d/%m/%Y"))
 
-@app.get("/matches/{licence}")
+
+@ app.get("/matches/{licence}")
 def get_match_by_licence(licence: str):
     '''Get last matches by licence'''
     return connexion_api("xml_partie", f"numlic={licence}").get('partie')
 
 
-
-@app.get("/teams/{num_club}")
+@ app.get("/teams/{num_club}")
 def get_teams_by_club(num_club: str):
     '''Get teams by club num for the actual phase'''
     phase = get_actual_phase()
@@ -69,7 +80,7 @@ def get_teams_by_club(num_club: str):
     return [team for team in teams if regex_phase.findall(team['libdivision'])]
 
 
-@app.get("/proA")
+@ app.get("/proA")
 def get_pro_a_stats():
     '''Get pro A statistics'''
     players = {}
@@ -96,7 +107,7 @@ def get_pro_a_stats():
 ALPHABET = '123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ'
 
 
-@app.get("/short_uuid_to_uuid/{short_uuid}")
+@ app.get("/short_uuid_to_uuid/{short_uuid}")
 def short_uuid_to_uuid(short_uuid):
     '''Convert short UUID to an UUID'''
     base = len(ALPHABET)
@@ -105,7 +116,7 @@ def short_uuid_to_uuid(short_uuid):
     return str(uuid.UUID(int=uuid_int, version=4))
 
 
-@app.get("/uuid_to_short_uuid/{uuidv4}")
+@ app.get("/uuid_to_short_uuid/{uuidv4}")
 def uuid_to_short_uuid(uuidv4):
     '''Convert an UUID to short UUID'''
     uuid_int = int(uuidv4.replace('-', ''), 16)
@@ -140,7 +151,7 @@ def get_actual_phase():
     return 1 if datetime.now().month > 8 else 2
 
 
-@app.get("/teams/{num_club}")
+@ app.get("/teams/{num_club}")
 def get_all_teams_by_club(num_club: str):
     '''Get teams by num club'''
     return connexion_api("xml_equipe", f"numclu={num_club}").get("equipe")
