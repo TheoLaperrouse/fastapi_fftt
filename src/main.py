@@ -5,8 +5,9 @@ import logging
 import uvicorn
 from fastapi import FastAPI
 from fastapi.responses import RedirectResponse
-from src.connexion_api import connexion_api
 from fastapi_utils.timing import add_timing_middleware
+from src.connexion_api import connexion_api
+
 
 
 logging.basicConfig(level=logging.INFO)
@@ -46,7 +47,11 @@ async def get_tftt_matches():
     all_matches = [
         {
             **match,
-            **(get_players_by_link(match['lien'], 'THORIGNE' in match['equa']) if isinstance(match['scorea'], str) else {}),
+            **(
+                get_players_by_link(match['lien'], 'THORIGNE' in match['equa'])
+                if isinstance(match['scorea'], str)
+                else {}
+            ),
             "equa": 
                 f"{match['equa']} Féminines" 
                 if 'Féminin' in team.get('libepr', '') and 'THORIGNE' in match['equa']
@@ -55,7 +60,6 @@ async def get_tftt_matches():
                 f"{match['equb']} Féminines" 
                 if 'Féminin' in team.get('libepr', '') and 'THORIGNE' in match['equb']
                 else match['equb'],
-            
         }
         for team in get_teams_by_club("03350060")
         for match in get_matches_poules_by_link(team["liendivision"])
@@ -180,7 +184,7 @@ def get_players_by_link(lien_match, is_equ_a):
         for joueur in games["joueur"]:
             is_sorted = is_equ_a != ('THORIGNE' in games["resultat"]["equa"])
             joueurs_a.append(joueur["xja"] if not is_sorted else joueur["xjb"])
-            joueurs_b.append(joueur["xjb"] if not is_sorted else joueur["xja"]) 
+            joueurs_b.append(joueur["xjb"] if not is_sorted else joueur["xja"])
         return {"joueursA": joueurs_a, "joueursB": joueurs_b}
     return {}
 
