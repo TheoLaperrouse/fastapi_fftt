@@ -46,7 +46,7 @@ async def get_tftt_matches():
     all_matches = [
         {
             **match,
-            **(get_players_by_link(match['lien'], 'THORIGNE' in match['equa']) if match['scorea'] is str else {}),
+            **(get_players_by_link(match['lien'], 'THORIGNE' in match['equa']) if isinstance(match['scorea'], str) else {}),
             "equa": 
                 f"{match['equa']} Féminines" 
                 if 'Féminin' in team.get('libepr', '') and 'THORIGNE' in match['equa']
