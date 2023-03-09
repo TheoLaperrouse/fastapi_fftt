@@ -1,5 +1,5 @@
-from fastapi import APIRouter
 import uuid
+from fastapi import APIRouter
 
 ALPHABET = '123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ'
 

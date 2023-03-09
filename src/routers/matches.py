@@ -11,6 +11,29 @@ router = APIRouter(
 )
 
 
+@router.get("/proA")
+def get_pro_a_stats():
+    '''Get pro A statistics'''
+    players = {}
+    matches = get_matches_poules_by_link(get_pro_a())
+    for match in [get_match_by_link(m['lien']) for m in matches]:
+        if match:
+            for individual_match in match:
+                if individual_match and individual_match['ja'] and individual_match['jb']:
+                    player_a, player_b = individual_match['ja'], individual_match['jb']
+                    score_a = individual_match.get('scorea', -1) == '1'
+                    players[player_a] = players.get(
+                        player_a, {'vict': 0, 'matches': 0})
+                    players[player_b] = players.get(
+                        player_b, {'vict': 0, 'matches': 0})
+                    players[player_a]['vict'] += score_a
+                    players[player_b]['vict'] += not score_a
+                    players[player_a]['matches'] += 1
+                    players[player_b]['matches'] += 1
+    for stats in players.values():
+        stats['win_ratio'] = f'{stats["vict"] / stats["matches"]:.0%}'
+    return sorted(players.items(), key=lambda x: x[1]['win_ratio'], reverse=True)
+
 @router.get("/tftt")
 async def get_tftt_matches():
     '''Get all the matches of the TFTT for the actual phase'''
@@ -68,27 +91,3 @@ def get_matches_poules_by_link(lien_div: str):
 def get_match_by_link(lien_match: str):
     '''Get individuals matches with a link'''
     return connexion_api("xml_chp_renc", lien_match).get('partie', [])
-
-
-@router.get("/proA")
-def get_pro_a_stats():
-    '''Get pro A statistics'''
-    players = {}
-    matches = get_matches_poules_by_link(get_pro_a())
-    for match in [get_match_by_link(m['lien']) for m in matches]:
-        if match:
-            for individual_match in match:
-                if individual_match and individual_match['ja'] and individual_match['jb']:
-                    player_a, player_b = individual_match['ja'], individual_match['jb']
-                    score_a = individual_match.get('scorea', -1) == '1'
-                    players[player_a] = players.get(
-                        player_a, {'vict': 0, 'matches': 0})
-                    players[player_b] = players.get(
-                        player_b, {'vict': 0, 'matches': 0})
-                    players[player_a]['vict'] += score_a
-                    players[player_b]['vict'] += not score_a
-                    players[player_a]['matches'] += 1
-                    players[player_b]['matches'] += 1
-    for stats in players.values():
-        stats['win_ratio'] = f'{stats["vict"] / stats["matches"]:.0%}'
-    return sorted(players.items(), key=lambda x: x[1]['win_ratio'], reverse=True)

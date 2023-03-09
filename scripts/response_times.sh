@@ -1,9 +1,14 @@
 #!/bin/bash
 
-ROUTES=("matches/proA")
+ROUTES=(
+  "matches/tftt"
+  "matches/proA"
+  "players/club/03350060"
+  "players/03350060"
+)
 NUM_REQUESTS=3
 OUTPUT_FILE="scripts/response_times.csv"
-echo "Route, Temps moyen de réponse (ms)" > $OUTPUT_FILE
+echo "Route, Temps moyen de réponse (s)" > $OUTPUT_FILE
 
 for ROUTE in "${ROUTES[@]}"
 do
@@ -16,7 +21,7 @@ do
     RESPONSE_TIME=$(echo "scale=2; ($END_TIME - $START_TIME) / 1000000" | bc)
     TOTAL_TIME=$(echo "scale=2; $TOTAL_TIME + $RESPONSE_TIME" | bc)
   done
-  AVG_TIME=$(echo "scale=2; $TOTAL_TIME / $NUM_REQUESTS" | bc)
+  AVG_TIME=$(echo "scale=2; $TOTAL_TIME / $NUM_REQUESTS / 1000" | bc)
   echo "$ROUTE, $AVG_TIME" >> $OUTPUT_FILE
 done
 

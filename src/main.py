@@ -12,6 +12,7 @@ logger = logging.getLogger(__name__)
 
 
 def init_routers(_app):
+    '''Initialize routers'''
     routers = [players, uuid, matches, teams]
     for router in routers:
         _app.include_router(router.router)
@@ -22,11 +23,10 @@ init_routers(app)
 add_timing_middleware(app, record=logger.info, prefix="app", exclude="untimed")
 
 
-@app.get("/", response_class=RedirectResponse, status_code=302)
+@app.get("/", include_in_schema=False)
 async def redirect_to_docs():
     '''Redirect to docs on /'''
     return RedirectResponse(url='/docs')
-
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
