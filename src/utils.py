@@ -1,5 +1,5 @@
 from datetime import datetime
-from src.connexion_api import connexion_api
+from src.api_connection import connect_api
 
 
 def get_actual_phase():
@@ -9,7 +9,7 @@ def get_actual_phase():
 
 def get_players_by_link(lien_match, is_equ_a):
     '''Get players of a match by link'''
-    games = connexion_api("xml_chp_renc", lien_match)
+    games = connect_api("xml_chp_renc", lien_match)
     joueurs_a = []
     joueurs_b = []
     if games["joueur"] is not None:

@@ -35,7 +35,14 @@ pip install -r requirements.txt
 ```sh
 uvicorn src.main:app --reload
 ```
+
 ### Docker 
+
+- Run a redis container with a redis insight container :
+```sh
+docker compose up
+```
+Redis is now on localhost:6379 and redis insight  on localhost:8001
 
 - Build the Docker image :
 ```sh
@@ -59,7 +66,7 @@ for match in res.json():
 ```
 - Get ProA Stats :
 ```python
-res = requests.get("http://fastapifftt.thorigne-tt.net/proA", timeout=60)
+res = requests.get("http://fastapifftt.thorigne-tt.net/matches/proA", timeout=60)
 for player in res.json():
     print(f'{player[0]} : {player[1]["vict"]}/{player[1]["matches"]} ' \
         f'({player[1]["win_ratio"]:.2f}%)')

@@ -1,8 +1,8 @@
 import hmac
 import hashlib
 import random
-import time
 import string
+import time
 import requests
 import xmltodict
 from dotenv import dotenv_values
@@ -12,12 +12,11 @@ BASE_URL = 'http://www.fftt.com/mobile/pxml'
 
 def sign_hmac_sha1(key, time_str):
     '''Sign with sha1'''
-    hmac_object = hmac.new(key.encode(
-        'utf-8'), time_str.encode('utf-8'), hashlib.sha1)
+    hmac_object = hmac.new(key.encode('utf-8'), time_str.encode('utf-8'), hashlib.sha1)
     return hmac_object.hexdigest()
 
 
-def connexion_api(api, params=None):
+def connect_api(api, params=None):
     '''Connect to the FFTT database'''
     id_fftt = config['ID_FFTT']
     key = hashlib.md5(config['KEY_FFTT'].encode('utf-8')).hexdigest()
