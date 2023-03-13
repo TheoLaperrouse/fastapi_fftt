@@ -4,7 +4,7 @@ import redis
 def redis_connect() -> redis.client.Redis:
     '''Connection to the redis container'''
     redis_connection = redis.Redis(
-        host="localhost",
+        host="redis",
         port=6379,
         db=0,
         socket_timeout=5,
