@@ -1,8 +1,6 @@
 import jsonpickle
 import redis
 
-redis_client = redis_connect()
-
 def redis_connect() -> redis.client.Redis:
     '''Connection to the redis container'''
     redis_connection = redis.Redis(
@@ -24,3 +22,5 @@ def cache(func):
             redis_client.set(key, jsonpickle.encode(result))
         return result
     return wrapper
+
+redis_client = redis_connect()
