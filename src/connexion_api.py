@@ -1,9 +1,10 @@
 import hmac
 import hashlib
 import random
-import time
 import string
+import time
 import requests
+import redis
 import xmltodict
 from dotenv import dotenv_values
 
@@ -37,3 +38,5 @@ def connexion_api(api, params=None):
     except requests.exceptions.HTTPError as error:
         print(f"HTTP error occurred: {error}")
         return None
+
+redis_client = redis.Redis(host='172.17.0.2', port=6379, db=0)

@@ -1,9 +1,10 @@
+import json
 from datetime import datetime
 from fastapi import APIRouter
 from src.connexion_api import connexion_api
 from src.utils import get_players_by_link
 from src.routers.teams import get_pro_a, get_teams_by_club
-
+from src.connexion_api import redis_client
 
 router = APIRouter(
     prefix="/matches",
@@ -54,6 +55,7 @@ async def get_tftt_matches():
                 if 'Féminin' in team.get('libepr', '') and 'THORIGNE' in match['equb']
                 else match['equb'],
         }
+        if not redis_client.get(match['lien']) else json.loads(redis_client.get(match['lien']))
         for team in get_teams_by_club("03350060")
         for match in get_matches_poules_by_link(team["liendivision"])
         if 'Vétérans' not in team["libdivision"]
@@ -62,6 +64,9 @@ async def get_tftt_matches():
         and match['equb'] is not None
         and ('THORIGNE' in match['equa'] or 'THORIGNE' in match['equb'])
     ]
+    for match in all_matches:
+        if isinstance(match['scorea'], str) and not redis_client.get(match['lien']):
+            redis_client.set(match['lien'], json.dumps(match))
     return sorted(all_matches, key=lambda d: datetime.strptime(d["dateprevue"], "%d/%m/%Y"))
 
 
@@ -69,7 +74,6 @@ async def get_tftt_matches():
 def get_matches_by_phase(num_club: str):
     '''Get all the matches of a club for the actual phase'''
     teams = get_teams_by_club(num_club)
-    print(teams)
     all_matches_by_team = [get_matches_poules_by_link(
         team["liendivision"]) for team in teams]
     all_matches = [

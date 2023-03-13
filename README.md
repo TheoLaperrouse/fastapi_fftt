@@ -35,7 +35,23 @@ pip install -r requirements.txt
 ```sh
 uvicorn src.main:app --reload
 ```
+
 ### Docker 
+
+- Run a redis container on port 6379 :
+```sh
+docker run --name redis -p 6379 -d redis 
+```
+
+- Get ip of the container :
+```sh
+docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' redis
+```
+
+- Connect to redis with redis-cli (KEY * to get all keys) :
+```sh
+redis-cli -h 172.17.0.2 -p 6379 
+```
 
 - Build the Docker image :
 ```sh

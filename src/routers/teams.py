@@ -2,7 +2,6 @@ import re
 from fastapi import APIRouter
 from src.connexion_api import connexion_api
 from src.utils import get_actual_phase
-
 router = APIRouter(
     prefix="/teams",
     tags=["teams"]

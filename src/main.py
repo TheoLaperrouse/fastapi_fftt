@@ -1,5 +1,3 @@
-
-
 import logging
 import uvicorn
 from fastapi import FastAPI
@@ -21,7 +19,6 @@ def init_routers(_app):
 app = FastAPI()
 init_routers(app)
 add_timing_middleware(app, record=logger.info, prefix="app", exclude="untimed")
-
 
 @app.get("/", include_in_schema=False)
 async def redirect_to_docs():

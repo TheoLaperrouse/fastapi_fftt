@@ -6,7 +6,9 @@ ROUTES=(
   "players/club/03350060"
   "players/03350060"
 )
+
 NUM_REQUESTS=3
+
 OUTPUT_FILE="scripts/response_times.csv"
 echo "Route, Temps moyen de réponse (s)" > $OUTPUT_FILE
 
