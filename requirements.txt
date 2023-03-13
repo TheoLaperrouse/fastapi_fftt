@@ -3,6 +3,7 @@ jsonpickle
 mailjet_rest
 pylint
 python-dotenv
+redis
 uuid
 uvicorn
 xmltodict
