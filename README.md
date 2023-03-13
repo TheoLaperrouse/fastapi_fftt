@@ -38,20 +38,11 @@ uvicorn src.main:app --reload
 
 ### Docker 
 
-- Run a redis container on port 6379 :
+- Run a redis container with a redis insight container :
 ```sh
-docker run --name redis -p 6379 -d redis 
+docker compose up
 ```
-
-- Get ip of the container :
-```sh
-docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' redis
-```
-
-- Connect to redis with redis-cli (KEY * to get all keys) :
-```sh
-redis-cli -h 172.17.0.2 -p 6379 
-```
+Redis is now on localhost:6379 and redis insight  on localhost:8001
 
 - Build the Docker image :
 ```sh
@@ -75,7 +66,7 @@ for match in res.json():
 ```
 - Get ProA Stats :
 ```python
-res = requests.get("http://fastapifftt.thorigne-tt.net/proA", timeout=60)
+res = requests.get("http://fastapifftt.thorigne-tt.net/matches/proA", timeout=60)
 for player in res.json():
     print(f'{player[0]} : {player[1]["vict"]}/{player[1]["matches"]} ' \
         f'({player[1]["win_ratio"]:.2f}%)')

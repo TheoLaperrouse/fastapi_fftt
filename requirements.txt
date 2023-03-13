@@ -1,5 +1,5 @@
 fastapi
-fastapi_utils
+jsonpickle
 mailjet_rest
 pylint
 python-dotenv

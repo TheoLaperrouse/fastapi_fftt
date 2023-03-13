@@ -4,7 +4,6 @@ import random
 import string
 import time
 import requests
-import redis
 import xmltodict
 from dotenv import dotenv_values
 
@@ -13,12 +12,11 @@ BASE_URL = 'http://www.fftt.com/mobile/pxml'
 
 def sign_hmac_sha1(key, time_str):
     '''Sign with sha1'''
-    hmac_object = hmac.new(key.encode(
-        'utf-8'), time_str.encode('utf-8'), hashlib.sha1)
+    hmac_object = hmac.new(key.encode('utf-8'), time_str.encode('utf-8'), hashlib.sha1)
     return hmac_object.hexdigest()
 
 
-def connexion_api(api, params=None):
+def connect_api(api, params=None):
     '''Connect to the FFTT database'''
     id_fftt = config['ID_FFTT']
     key = hashlib.md5(config['KEY_FFTT'].encode('utf-8')).hexdigest()
@@ -38,5 +36,3 @@ def connexion_api(api, params=None):
     except requests.exceptions.HTTPError as error:
         print(f"HTTP error occurred: {error}")
         return None
-
-redis_client = redis.Redis(host='172.17.0.2', port=6379, db=0)

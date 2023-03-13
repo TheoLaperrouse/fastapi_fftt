@@ -1,16 +1,15 @@
 import json
 from datetime import datetime
 from fastapi import APIRouter
-from src.connexion_api import connexion_api
+from src.api_connection import connect_api
 from src.utils import get_players_by_link
 from src.routers.teams import get_pro_a, get_teams_by_club
-from src.connexion_api import redis_client
+from src.redis import redis_client
 
 router = APIRouter(
     prefix="/matches",
     tags=["matches"]
 )
-
 
 @router.get("/proA")
 def get_pro_a_stats():
@@ -84,14 +83,14 @@ def get_matches_by_phase(num_club: str):
 @router.get("/{licence}")
 def get_match_by_licence(licence: str):
     '''Get last matches by licence'''
-    return connexion_api("xml_partie", f"numlic={licence}").get('partie')
+    return connect_api("xml_partie", f"numlic={licence}").get('partie')
 
 
 def get_matches_poules_by_link(lien_div: str):
     '''Get matches poules with a link'''
-    return connexion_api("xml_result_equ", lien_div).get('tour', [])
+    return connect_api("xml_result_equ", lien_div).get('tour', [])
 
 
 def get_match_by_link(lien_match: str):
     '''Get individuals matches with a link'''
-    return connexion_api("xml_chp_renc", lien_match).get('partie', [])
+    return connect_api("xml_chp_renc", lien_match).get('partie', [])
