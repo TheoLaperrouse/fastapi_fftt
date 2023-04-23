@@ -12,7 +12,7 @@ def get_players_by_link(lien_match, is_equ_a):
     games = connect_api("xml_chp_renc", lien_match)
     joueurs_a = []
     joueurs_b = []
-    if games["joueur"] is not None:
+    if games and games["joueur"] is not None:
         for joueur in games["joueur"]:
             is_sorted = is_equ_a != ('THORIGNE' in games["resultat"]["equa"])
             joueurs_a.append(joueur["xja"] if not is_sorted else joueur["xjb"])
