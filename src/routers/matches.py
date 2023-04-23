@@ -57,7 +57,6 @@ async def get_tftt_matches():
                 if 'Féminin' in team.get('libepr', '') and 'THORIGNE' in match['equb']
                 else match['equb'],
         }
-        if not redis_client.get(match['lien']) else json.loads(redis_client.get(match['lien']))
         for team in teams
         for match in get_matches_poules_by_link(team["liendivision"])
         if match is not None
@@ -65,9 +64,6 @@ async def get_tftt_matches():
         and match['equb'] is not None
         and ('THORIGNE' in match['equa'] or 'THORIGNE' in match['equb'])
     ]
-    for match in all_matches:
-        if isinstance(match['scorea'], str) and not redis_client.get(match['lien']):
-            redis_client.set(match['lien'], json.dumps(match))
     return sorted(all_matches, key=lambda d: datetime.strptime(d["dateprevue"], "%d/%m/%Y"))
 
 
