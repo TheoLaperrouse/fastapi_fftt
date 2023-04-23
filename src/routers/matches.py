@@ -33,7 +33,7 @@ def get_pro_a_stats():
                         players[player_a]['club'], players[player_b]['club'] = teams
     for stats in players.values():
         stats['win_ratio'] = f'{stats["vict"] / stats["matches"]:.0%}'
-    return sorted(players.items(), key=lambda x: x[1]['win_ratio'], reverse=True)
+    return sorted(players.items(), key=lambda x: x[1]['vict'] / x[1]['matches'], reverse=True)
 
 @router.get("/tftt")
 async def get_tftt_matches():
