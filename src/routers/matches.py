@@ -1,10 +1,8 @@
-import json
 from datetime import datetime
 from fastapi import APIRouter
 from src.api_connection import connect_api
 from src.utils import get_players_by_link
 from src.routers.teams import get_pro_a, get_teams_by_club
-from src.redis import redis_client
 
 router = APIRouter(
     prefix="/matches",

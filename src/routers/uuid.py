@@ -14,6 +14,11 @@ def short_uuid_to_uuid(short_uuid):
                    c in enumerate(reversed(short_uuid)))
     return str(uuid.UUID(int=uuid_int, version=4))
 
+@router.get("/random_uuid")
+def random_uuid():
+    '''Get a random UUID v4'''
+    return uuid.uuid4()
+
 
 @router.get("/uuid_to_short_uuid/{uuidv4}")
 def uuid_to_short_uuid(uuidv4):
