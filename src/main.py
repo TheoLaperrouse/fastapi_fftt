@@ -2,7 +2,7 @@ import logging
 import uvicorn
 from fastapi import FastAPI
 from fastapi.responses import RedirectResponse
-from src.routers import players, uuid, matches, teams
+from src.routers import players, uuid, matches, teams, clubs
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 def init_routers(_app):
     '''Initialize routers'''
-    routers = [players, uuid, matches, teams]
+    routers = [players, uuid, matches, teams, clubs]
     for router in routers:
         _app.include_router(router.router)
 
