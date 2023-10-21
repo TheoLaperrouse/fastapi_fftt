@@ -6,6 +6,7 @@ router = APIRouter(
     tags=["players"]
 )
 
+
 @router.get("/name/{last_name}_{first_name}")
 def get_player_by_name(last_name: str, first_name: str):
     '''Get player by name'''

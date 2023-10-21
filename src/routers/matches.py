@@ -9,35 +9,39 @@ router = APIRouter(
     tags=["matches"]
 )
 
+
 @router.get("/proA")
 def get_pro_a_stats():
     '''Get pro A statistics'''
     players = {}
     matches = get_matches_poules_by_link(get_pro_a())
     for match in [get_match_info_by_link(m['lien']) for m in matches]:
-        if match.get('partie', []) :
-            teams = [match['resultat'].get('equa',''),match['resultat'].get('equb','')]
+        if match.get('partie', []):
+            teams = [match['resultat'].get(
+                'equa', ''), match['resultat'].get('equb', '')]
             for individual_match in match.get('partie', []):
                 if individual_match and individual_match['ja'] and individual_match['jb']:
                     player_a, player_b = individual_match['ja'], individual_match['jb']
                     score_a = individual_match.get('scorea', -1) == '1'
-                    players[player_a] = players.get(player_a, {'vict': 0, 'matches': 0})
+                    players[player_a] = players.get(
+                        player_a, {'vict': 0, 'matches': 0})
                     players[player_a]['vict'] += score_a
-                    players[player_b] = players.get(player_b, {'vict': 0, 'matches': 0})
+                    players[player_b] = players.get(
+                        player_b, {'vict': 0, 'matches': 0})
                     players[player_b]['vict'] += not score_a
                     players[player_b]['matches'] += 1
                     players[player_a]['matches'] += 1
-                    if 'club' not in players[player_a] :
+                    if 'club' not in players[player_a]:
                         players[player_a]['club'], players[player_b]['club'] = teams
     for stats in players.values():
         stats['win_ratio'] = f'{stats["vict"] / stats["matches"]:.0%}'
     return sorted(players.items(), key=lambda x: x[1]['vict'] / x[1]['matches'], reverse=True)
 
+
 @router.get("/tftt")
 async def get_tftt_matches():
     '''Get all the matches of the TFTT for the actual phase'''
-    teams = [team for team in get_teams_by_club("03350060")
-                if 'Vétérans' not in team['libdivision']]
+    teams = [team for team in get_teams_by_club("03350060")]
     all_matches = [
         {
             **match,
@@ -68,7 +72,8 @@ async def get_tftt_matches():
 @router.get("/club/{num_club}")
 def get_matches_by_phase(num_club: str):
     '''Get all the matches of a club for the actual phase'''
-    teams = get_teams_by_club(num_club)
+    teams = [team for team in get_teams_by_club(
+        num_club) if 'Vétérans' not in team['libdivision']]
     all_matches_by_team = [get_matches_poules_by_link(
         team["liendivision"]) for team in teams]
     all_matches = [
@@ -90,6 +95,7 @@ def get_matches_poules_by_link(lien_div: str):
 def get_match_by_link(lien_match: str):
     '''Get individuals matches with a link'''
     return connect_api("xml_chp_renc", lien_match).get('partie', [])
+
 
 def get_match_info_by_link(lien_match: str):
     '''Get individuals matches with a link'''

@@ -8,6 +8,7 @@ router = APIRouter(
     tags=["teams"]
 )
 
+
 def get_pro_a():
     '''Get the proA team'''
     for team in get_all_teams_by_club('03350060'):
