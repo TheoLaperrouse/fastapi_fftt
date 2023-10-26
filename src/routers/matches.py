@@ -10,7 +10,7 @@ router = APIRouter(
 )
 
 
-@router.get("/proA")
+@router.get("/proA/stats")
 def get_pro_a_stats():
     '''Get pro A statistics'''
     players = {}
@@ -36,6 +36,13 @@ def get_pro_a_stats():
     for stats in players.values():
         stats['win_ratio'] = f'{stats["vict"] / stats["matches"]:.0%}'
     return sorted(players.items(), key=lambda x: x[1]['vict'] / x[1]['matches'], reverse=True)
+
+
+@router.get("/proA")
+def get_pro_a_matches():
+    '''Get pro A matches'''
+    matches = get_matches_poules_by_link(get_pro_a())
+    return matches
 
 
 @router.get("/tftt")
