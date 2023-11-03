@@ -48,7 +48,8 @@ def get_pro_a_matches():
 @router.get("/tftt")
 async def get_tftt_matches():
     '''Get all the matches of the TFTT for the actual phase'''
-    teams = [team for team in get_teams_by_club("03350060")]
+    teams = [team for team in get_teams_by_club(
+        "03350060") if 'Vétérans' not in team['libdivision']]
     all_matches = [
         {
             **match,
