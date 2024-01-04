@@ -37,10 +37,7 @@ params = {
     'indoor': 'true'
 }
 
-headers = {
-    'Accept': 'application/json',
-    'Accept-Language': 'fr-FR',
-}
+headers = {'Accept': 'application/json', 'Accept-Language': 'fr-FR'}
 
 locale.setlocale(locale.LC_TIME, 'fr_FR.UTF-8')
 
@@ -73,4 +70,25 @@ def get_padel_slots(days: int = 7):
                                 court_data[day].setdefault(
                                     hour, set()).add(duration)
         res += get_results_string(club_name, court_data)
-    return HTMLResponse(content=res)
+    return HTMLResponse(content=f'''<html>
+                                    <head>
+                                        <style>
+                                            body {{
+                                                font-family: Arial, sans-serif;
+                                                background-color: #f4f4f4;
+                                                margin: 20px;
+                                            }}
+                                            h1 {{
+                                                color: #333;
+                                            }}
+                                            h2 {{
+                                                color: #555;
+                                            }}
+                                            p {{
+                                                color: #777;
+                                            }}
+                                        </style>
+                                    </head>
+                                        <body>{res}</body>
+                                    </html>
+                                    ''')
