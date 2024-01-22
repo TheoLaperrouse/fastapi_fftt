@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 from fastapi import APIRouter
 from fastapi.responses import HTMLResponse
 import requests
+from dateutil import parser
 
 
 router = APIRouter(
@@ -90,9 +91,8 @@ def format_urban_soccer(days):
             day = current_date.strftime('%A %d %B').capitalize()
             if day not in court_data:
                 court_data[day] = {}
-            datetime_object = datetime.strptime(
-                slot['start'], "%Y-%m-%dT%H:%M:%S")
-            hour = datetime_object.time()
+            datetime_object = parser.parse(slot['start'])
+            hour = datetime_object.time().strftime("%H:%M")
             duration = f"{slot['duration']} min"
             court_data[day].setdefault(
                 hour, set()).add(duration)
