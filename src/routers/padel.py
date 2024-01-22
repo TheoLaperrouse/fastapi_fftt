@@ -3,7 +3,6 @@ from datetime import datetime, timedelta
 from fastapi import APIRouter
 from fastapi.responses import HTMLResponse
 import requests
-from dateutil import parser
 
 
 router = APIRouter(
@@ -13,6 +12,19 @@ router = APIRouter(
 
 locale.setlocale(locale.LC_TIME, 'fr_FR.UTF-8')
 start_date = datetime.now()
+
+
+def parse_date(date_str):
+    try:
+        datetime_object = datetime.strptime(date_str, "%Y-%m-%dT%H:%M:%S")
+    except ValueError:
+        try:
+            datetime_object = datetime.strptime(
+                date_str, "%Y-%m-%dT%H:%M:%S%z")
+        except ValueError as e:
+            print(f"Erreur de format de date : {e}")
+            return None
+    return datetime_object
 
 
 def format_name_club(name, link):
@@ -91,7 +103,7 @@ def format_urban_soccer(days):
             day = current_date.strftime('%A %d %B').capitalize()
             if day not in court_data:
                 court_data[day] = {}
-            datetime_object = parser.parse(slot['start'])
+            datetime_object = parse_date(slot['start'])
             hour = datetime_object.time().strftime("%H:%M")
             duration = f"{slot['duration']} min"
             court_data[day].setdefault(
