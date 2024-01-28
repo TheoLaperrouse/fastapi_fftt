@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from fastapi import APIRouter
 from fastapi.responses import HTMLResponse
 import requests
-
+import uuid
 
 router = APIRouter(
     prefix="/padel",
@@ -68,7 +68,7 @@ def format_doin_sport(club_id, days):
         current_date = start_date + timedelta(days=day)
         current_date_str = current_date.strftime('%Y-%m-%d')
         response = requests.get(
-            url + current_date_str, params=params, headers={'Accept': 'application/json', 'Accept-Language': 'fr-FR'}, timeout=30)
+            url + current_date_str, params=params, headers={'Accept': 'application/json', 'Accept-Language': 'fr-FR', 'If-None-Match': str(uuid.uuid4()).replace("-", "")}, timeout=30)
         for court in response.json():
             day = current_date.strftime('%A %d %B').capitalize()
             if day not in court_data:
@@ -95,6 +95,7 @@ def format_urban_soccer(days):
             headers={
                 'activity': '2',
                 'content-type': 'multipart/form-data; boundary=----WebKitFormBoundaryhp2KwsnB0C7sSvDY',
+                'If-None-Match': str(uuid.uuid4()).replace("-", "")
             },
             data=f'------WebKitFormBoundaryhp2KwsnB0C7sSvDY\r\nContent-Disposition: form-data; name="centerId"\r\n\r\n15\r\n------WebKitFormBoundaryhp2KwsnB0C7sSvDY\r\nContent-Disposition: form-data; name="periodStart"\r\n\r\n{current_date_str}T01:00:00\r\n------WebKitFormBoundaryhp2KwsnB0C7sSvDY\r\nContent-Disposition: form-data; name="categories"\r\n\r\n[7]\r\n------WebKitFormBoundaryhp2KwsnB0C7sSvDY--\r\n',
             timeout=30)
@@ -108,7 +109,6 @@ def format_urban_soccer(days):
             duration = f"{slot['duration']} min"
             court_data[day].setdefault(
                 hour, set()).add(duration)
-    print(court_data)
     return court_data
 
 
