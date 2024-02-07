@@ -11,7 +11,6 @@ router = APIRouter(
 )
 
 locale.setlocale(locale.LC_TIME, 'fr_FR.UTF-8')
-start_date = datetime.now()
 
 
 def parse_date(date_str):
@@ -54,6 +53,7 @@ def get_html_result(club_name, court_data):
 
 def format_doin_sport(club_id, days):
     '''Format slots of DoInSport API'''
+    start_date = datetime.now()
     url = 'https://api-v3.doinsport.club/clubs/playgrounds/plannings/'
     params = {
         'from': '8:00:00',
@@ -86,6 +86,7 @@ def format_doin_sport(club_id, days):
 
 def format_urban_soccer(days):
     '''Format slots of Urban Soccer'''
+    start_date = datetime.now()
     court_data = {}
     for day in range(days):
         current_date = start_date + timedelta(days=day)

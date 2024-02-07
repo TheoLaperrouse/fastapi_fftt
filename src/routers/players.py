@@ -16,7 +16,7 @@ def get_player_by_name(last_name: str, first_name: str):
 @router.get("/club/{num_club}")
 def get_players_by_club(num_club: str):
     '''Get players by club num'''
-    return connect_api("xml_liste_joueur_o", f"club={num_club}").get('joueur')
+    return connect_api("xml_liste_joueur", f"club={num_club}").get('joueur')
 
 
 @router.get("/{licence}")
