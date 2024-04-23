@@ -84,49 +84,14 @@ def format_doin_sport(club_id, days):
     return court_data
 
 
-def format_urban_soccer(days):
-    '''Format slots of Urban Soccer'''
-    start_date = datetime.now()
-    court_data = {}
-    for day in range(days):
-        current_date = start_date + timedelta(days=day)
-        current_date_str = current_date.strftime('%Y-%m-%d')
-        response = response = requests.post(
-            'https://my.urbansoccer.fr/api/read/reservation/availabilities/search',
-            headers={
-                'activity': '2',
-                'content-type': 'multipart/form-data; boundary=----WebKitFormBoundaryhp2KwsnB0C7sSvDY',
-                'If-None-Match': str(uuid.uuid4()).replace("-", "")
-            },
-            data=f'------WebKitFormBoundaryhp2KwsnB0C7sSvDY\r\nContent-Disposition: form-data; name="centerId"\r\n\r\n15\r\n------WebKitFormBoundaryhp2KwsnB0C7sSvDY\r\nContent-Disposition: form-data; name="periodStart"\r\n\r\n{current_date_str}T01:00:00\r\n------WebKitFormBoundaryhp2KwsnB0C7sSvDY\r\nContent-Disposition: form-data; name="categories"\r\n\r\n[7]\r\n------WebKitFormBoundaryhp2KwsnB0C7sSvDY--\r\n',
-            timeout=30)
-        json = response.json()
-        for slot in json['data'][1]:
-            day = current_date.strftime('%A %d %B').capitalize()
-            if day not in court_data:
-                court_data[day] = {}
-            datetime_object = parse_date(slot['start'])
-            hour = datetime_object.time().strftime("%H:%M")
-            duration = f"{slot['duration']} min"
-            court_data[day].setdefault(
-                hour, set()).add(duration)
-    return court_data
-
-
 @router.get("/slots", response_class=HTMLResponse)
 def get_padel_slots(days: int = 7):
     '''Get padel over n days'''
     res = ''
 
-    # DoInSport Padel
     for club_id, club_name in CLUBS.items():
         court_data = format_doin_sport(club_id, days)
         res += get_html_result(club_name, court_data)
-    # UrbanSoccer Vern
-    court_data = format_urban_soccer(days)
-    urban_name = format_name_club(
-        'Urban Soccer Vern', 'https://my.urbansoccer.fr/padel/reserver/?centerId=15&activity=7&typeName=Padel')
-    res += get_html_result(urban_name, court_data)
     return HTMLResponse(content=f'''<html>
                                     <head>
                                         <style>
