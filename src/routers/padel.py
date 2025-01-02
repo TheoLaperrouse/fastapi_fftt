@@ -4,6 +4,10 @@ from fastapi import APIRouter
 from fastapi.responses import HTMLResponse
 import requests
 import uuid
+import requests
+import random
+import string
+from requests_toolbelt import MultipartEncoder
 
 router = APIRouter(
     prefix="/padel",
@@ -36,6 +40,10 @@ CLUBS = {
     '348d19e8-95d5-4ffa-880d-8462b832b4ad': format_name_club('Soccer Rennais - Route de Lorient', 'https://www.soccer-rennais.com/r%C3%A9servations'),
     '83abc3cd-22ee-4fbd-ac57-5f95b4971d9d': format_name_club('Breizh Padel - Bruz', 'https://breizhpadel.doinsport.club/select-booking?name=Breizh%20Padel&guid=83abc3cd-22ee-4fbd-ac57-5f95b4971d9d&from=sport')
 }
+URBAN_CLUBS = {
+    '15': format_name_club('Urban Padel - Rennes / Vern', 'https://myurban.fr/padel/reserver?centerId=15&activity=7'),
+    '19': format_name_club('Urban Padel - Cap Malo', 'https://myurban.fr/padel/reserver?centerId=19&activity=7')
+}
 
 
 def get_html_result(club_name, court_data):
@@ -67,30 +75,90 @@ def format_doin_sport(club_id, days):
     for day in range(days):
         current_date = start_date + timedelta(days=day)
         current_date_str = current_date.strftime('%Y-%m-%d')
-        response = requests.get(
-            url + current_date_str, params=params, headers={'Accept': 'application/json', 'Accept-Language': 'fr-FR', 'If-None-Match': str(uuid.uuid4()).replace("-", "")}, timeout=30)
-        for court in response.json():
-            day = current_date.strftime('%A %d %B').capitalize()
-            if day not in court_data:
-                court_data[day] = {}
-            for activity in court['activities']:
-                for slot in activity['slots']:
-                    for price in slot['prices']:
-                        if price.get('bookable', False):
-                            hour = slot['startAt']
-                            duration = f'{int(price["duration"] / 60)} min'
-                            court_data[day].setdefault(
-                                hour, set()).add(duration)
+        try:
+            response = requests.get(
+                url + current_date_str,
+                params=params,
+                headers={
+                    'Accept': 'application/json',
+                    'Accept-Language': 'fr-FR',
+                    'If-None-Match': str(uuid.uuid4()).replace("-", "")
+                },
+                timeout=30
+            )
+            response.raise_for_status()
+            for court in response.json():
+                day = current_date.strftime('%A %d %B').capitalize()
+                if day not in court_data:
+                    court_data[day] = {}
+                for activity in court['activities']:
+                    for slot in activity['slots']:
+                        for price in slot['prices']:
+                            if price.get('bookable', False):
+                                hour = slot['startAt']
+                                duration = f'{int(price["duration"] / 60)} min'
+                                court_data[day].setdefault(
+                                    hour, set()).add(duration)
+        except Exception as e:
+            print(
+                f"Erreur lors de l'appel DoInSport pour le club {club_id} : {e}")
+    return court_data
+
+
+def format_urban_soccer(club_id, days):
+    '''Format slots of Urban Padel'''
+    start_date = datetime.now()
+    court_data = {}
+    for day in range(days):
+        url = "https://myurban.fr/api/read/reservation/availabilities/search"
+        current_date = start_date + timedelta(days=day)
+        current_date_str = current_date.strftime('%Y-%m-%d')
+        fields = {
+            "categories": "[7]",
+            "centerId": club_id,
+            "periodStart": current_date_str,
+        }
+
+        boundary = '----WebKitFormBoundary' + \
+            ''.join(random.choices(string.ascii_letters + string.digits, k=16))
+
+        data = MultipartEncoder(fields=fields, boundary=boundary)
+
+        headers = {
+            "accept": "application/json",
+            "activity": "2",
+            "content-type": data.content_type
+        }
+
+        try:
+            response = requests.post(url, headers=headers, data=data)
+            response.raise_for_status()
+            json = response.json()
+
+            for slot in json['data'][1]:
+                day = current_date.strftime('%A %d %B').capitalize()
+                if day not in court_data:
+                    court_data[day] = {}
+                datetime_object = parse_date(slot['start'])
+                hour = datetime_object.time().strftime("%H:%M")
+                duration = f"{slot['duration']} min"
+                court_data[day].setdefault(hour, set()).add(duration)
+        except Exception as e:
+            print(
+                f"Erreur lors de l'appel Urban Padel pour le club {club_id} : {e}")
     return court_data
 
 
 @router.get("/slots", response_class=HTMLResponse)
-def get_padel_slots(days: int = 7):
+def get_padel_slots(days: int = 3):
     '''Get padel over n days'''
     res = ''
 
     for club_id, club_name in CLUBS.items():
         court_data = format_doin_sport(club_id, days)
+        res += get_html_result(club_name, court_data)
+    for club_id, club_name in URBAN_CLUBS.items():
+        court_data = format_urban_soccer(club_id, days)
         res += get_html_result(club_name, court_data)
     return HTMLResponse(content=f'''<html>
                                     <head>

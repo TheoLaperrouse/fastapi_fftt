@@ -50,6 +50,7 @@ async def get_tftt_matches():
     '''Get all the matches of the TFTT for the actual phase'''
     teams = [team for team in get_teams_by_club(
         "03350060") if 'Vétérans' not in team['libdivision']]
+    seen_links = set()
     all_matches = [
         {
             **match,
@@ -73,6 +74,8 @@ async def get_tftt_matches():
         and match['equa'] is not None
         and match['equb'] is not None
         and ('THORIGNE' in match['equa'] or 'THORIGNE' in match['equb'])
+        and match['lien'] not in seen_links
+        and not seen_links.add(match['lien'])
     ]
     return sorted(all_matches, key=lambda d: datetime.strptime(d["dateprevue"], "%d/%m/%Y"))
 
